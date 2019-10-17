@@ -1,0 +1,5 @@
+.nextflow*
+test_output
+.vscode
+work
+local_ariba_db
