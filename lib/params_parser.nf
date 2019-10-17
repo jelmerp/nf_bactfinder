@@ -51,8 +51,6 @@ def process_params(Map params, String version) {
 
     // set up output directory
     final_params.output_dir = check_mandatory_parameter(params, 'output_dir') - ~/\/$/
-    check_optional_parameters(params, ['ariba_database_dir', 'ariba_get_database'])
-
 
     // assign Minimum coverage
     if ( params.resfinder_min_cov ) {
@@ -75,21 +73,21 @@ def process_params(Map params, String version) {
         final_params.resfinder_species = false
     }
 
-    //resfinder_database to be used
+    // resfinder_database to be used
     if ( params.resfinder_db_resfinder ) {
         final_params.resfinder_db_resfinder = params.resfinder_db_resfinder
     } else {
         final_params.resfinder_db_resfinder = "/resfinder/db_resfinder"
     }
 
-    //pointfinder_database to be used
+    // pointfinder_database to be used
     if ( params.resfinder_db_pointfinder ) {
         final_params.resfinder_db_pointfinder = params.resfinder_db_pointfinder
     } else {
         final_params.resfinder_db_pointfinder = "/resfinder/db_pointfinder"
     }
 
-    //
+    // check species is set if pointfinder required
     if (params.resfinder_point_mutation) {
         if (!params.resfinder_species){
             println "The point_mutation option must be used only with --species"
@@ -99,9 +97,18 @@ def process_params(Map params, String version) {
         }
     }
 
-
+    // ariba database - default is in container at /resfinder_database.17.10.2019
     if (params.ariba_database_dir){
         final_params.ariba_database_dir = file(params.ariba_database_dir)
+    } else {
+        final_params.ariba_database_dir = file('/resfinder_database.17.10.2019')
+    }
+
+    // ariba summary columns (default --preset cluster_all)
+    if (params.ariba_extra_summary_arguments){
+        final_params.ariba_extra_summary_arguments = params.ariba_extra_summary_arguments
+    } else {
+        final_params.ariba_extra_summary_arguments = '--preset cluster_all'
     }
 
     return final_params

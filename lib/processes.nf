@@ -1,9 +1,7 @@
-process run_resfinder {
+process resfinder {
   tag { sample_id }
   publishDir "${params.output_dir}/resfinder",
   mode:"copy"
-
-  container 'bioinformant/ghru-resfinder4'
 
   input:
   tuple sample_id, file(reads)
@@ -25,24 +23,55 @@ process run_resfinder {
      """
 }
 
- process run_ariba {
+ process resfinder_summary {
+  tag {'resfinder summary'}
+  publishDir "${params.output_dir}/resfinder", mode: 'copy'
+
+  input:
+  file(resfinder_output_dirs)
+
+  output:
+  tuple file('species_specific_summary.tsv'), file('full_summary.tsv')
+
+  script:
+  species = params.resfinder_species.toLowerCase().replaceAll(" ", "_")
+  """
+  python3 /scripts/parse_resfinder_4_output.py '${resfinder_output_dirs}' . ${species}
+  """
+}
+
+ process ariba {
    tag {sample_id}
    publishDir "${params.output_dir}/ariba",
     mode: 'copy',
-    pattern: "${sample_id}.report.tsv"
-
-   container 'bioinformant/ghru-ariba'
+    saveAs: { file -> file + ".report.tsv" }
 
    input:
    tuple sample_id, file(reads)
    file(database_dir)
 
    output:
-   tuple sample_id, file("${sample_id}.ariba")
-   file "${sample_id}.report.tsv"
+   file("${sample_id}")
 
    """
    ariba run ${database_dir} ${reads[0]} ${reads[1]} ${sample_id}.ariba
-   cp ${sample_id}.ariba/report.tsv ${sample_id}.report.tsv
+   mv ${sample_id}.ariba/report.tsv ${sample_id}
    """
  }
+
+ process ariba_summary {
+  tag {'ariba summary'}
+  publishDir "${params.output_dir}/ariba", mode: 'copy'
+
+  input:
+  file(report_tsvs)
+  file(database_dir)
+
+  output:
+  file "ariba_${database_dir}_summary.*"
+
+  script:
+  """
+  ariba summary ${params.ariba_extra_summary_arguments} ariba_${database_dir}_summary ${report_tsvs}
+  """
+}

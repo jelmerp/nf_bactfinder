@@ -16,19 +16,14 @@ def help_message() {
         --fastq_pattern             The regular expression that will match fastq files e.g '*_{1,2}.fastq.gz'
         --output_dir                Path to output dir
 
-        Mandatory ariba argument (one of the following)""
-        --ariba_database_dir   Path to a local dir containing ariba resitance database
-        --ariba_get_database   Specify a valid database from 
-                            argannot, card, megares, plasmidfinder, resfinder, srst2_argannot,
-                            vfdb_core, vfdb_full, virulencefinder
-
         Optional ariba arguments:
+        --ariba_database_dir   Path to a local dir containing ariba resitance database (default is /resfinder_database.17.10.2019)
         --ariba_extra_summary_arguments Supply the non-default options for the ariba summary command.
             Wrap these in quotes e.g '--preset minimal --min_id 95'
         
         Optional resfinder arguments:
-        --resfinder_min_cov                     Minimum breadth of coverage
-        --resfinder_identity_threshold          Minimum identity for the match to the AMR determinant
+        --resfinder_min_cov                     Minimum breadth of coverage (default 0.9)
+        --resfinder_identity_threshold          Minimum identity for the match to the AMR determinant (default 0.9)
         --resfinder_species                     Name of the species
         --resfinder_point_mutation              Find point mutation-based resistance
         --resfinder_db_resfinder                Path to the resfinder database (default is /resfinder/db_resfinder)

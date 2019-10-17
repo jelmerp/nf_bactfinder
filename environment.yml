@@ -1,0 +1,9 @@
+name: ghru-amr-prediction
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python=3.6.9
+  - pip=19.2.3
+  - ariba=2.14.4
