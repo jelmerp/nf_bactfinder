@@ -31,3 +31,11 @@ Samples will be processed using a resfinder database of acquired AMR genes and a
 
 ### Resfinder4
 Samples will be processed using the resfinder4 software and the predicted antimicrobial sensitivities found in the files `full_summary.tsv` and `species_specific_summary.tsv` in a sub-directory named resfinder within the output directory set using `--output_dir`
+
+---
+
+### Running test data
+The test dataset can be run using this command
+```
+export NXF_VER=19.09.0-edge && nextflow run main.nf --input_dir $PWD/test_input --fastq_pattern '*{R,_}{1,2}.fastq.gz' --output_dir $PWD/test_output --resfinder_species 'Staphylococcus aureus'
+```
