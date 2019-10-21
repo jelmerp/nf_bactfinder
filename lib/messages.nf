@@ -19,7 +19,7 @@ def help_message() {
         Optional ariba arguments:
         --ariba_database_dir   Path to a local dir containing ariba resitance database (default is /resfinder_database.17.10.2019)
         --ariba_extra_summary_arguments Supply the non-default options for the ariba summary command.
-            Wrap these in quotes e.g '--preset minimal --min_id 95'
+            Wrap these in quotes e.g '--preset minimal --min_id 95' (default is '--preset cluster_all')
         
         Optional resfinder arguments:
         --resfinder_min_cov                     Minimum breadth of coverage (default 0.9)
