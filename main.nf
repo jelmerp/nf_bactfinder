@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 
 // Pipeline version
-version = '0.1_JWP'
+version = '0.2'
 //TODO - Switch to containers
 
 //==============================================================================
@@ -19,7 +19,7 @@ def help_message() {
     println(
         """
         REQUIRED OPTIONS:
-          --indir               Path to input dir with genome assembly FASTA file
+          --indir               Path to input dir with genome assembly FASTA file(s)
           --species             Quoted name of the species, e.g. "Salmonella enterica"
         
         OTHER OPTIONS:
