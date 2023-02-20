@@ -7,28 +7,26 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --mail-type=FAIL
-#SBATCH --job-name=ghru_finder
-#SBATCH --output=slurm-ghru_finder-%j.out
+#SBATCH --job-name=nf_bactfinder
+#SBATCH --output=slurm-nf_bactfinder-%j.out
 
 # ==============================================================================
 #                          CONSTANTS AND DEFAULTS
 # ==============================================================================
 # Constants
-readonly SCRIPT_NAME=ghru_finder.sh
+readonly NF_REPO=https://github.com/jelmerp/nf_bactfinder
+readonly CONDA_ENV=/fs/project/PAS0471/jelmer/conda/nextflow
+readonly SCRIPT_NAME=nf_bactfinder.sh
 readonly SCRIPT_VERSION="1.0"
 readonly SCRIPT_AUTHOR="Jelmer Poelstra"
-readonly CONDA_ENV=/fs/project/PAS0471/jelmer/conda/nextflow
-
-# URL to OSC Nextflow config file
-OSC_CONFIG_URL=https://raw.githubusercontent.com/mcic-osu/mcic-scripts/main/nextflow/osc.config
-osc_config=mcic-scripts/nextflow/osc.config  # Will be downloaded if not present here
+readonly OSC_CONFIG_URL=https://raw.githubusercontent.com/mcic-osu/mcic-scripts/main/nextflow/osc.config
 
 # Option defaults
-nf_file="/fs/project/PAS0471/jelmer/assist/2022-09_alejandra/workflows/ghru_finder/main.nf"
+osc_config=mcic-scripts/nextflow/osc.config  # Will be downloaded if not present here
 container_dir=/fs/project/PAS0471/containers
-work_dir=/fs/scratch/PAS0471/$USER/nf_resfinder
+work_dir=/fs/scratch/PAS0471/$USER/nf_bactfinder
+outdir=results/nf_bactfinder
 profile="conda"
-outdir=results/ghru_finder
 resume=true && resume_arg="-resume"
 
 # ==============================================================================
@@ -41,7 +39,9 @@ script_help() {
     echo "                     $0"
     echo "             Run the BactFinder nextflow workflow"
     echo "======================================================================"
-    echo
+    echo "USAGE:"
+    echo "  sbatch nf_bactfinder.sh -i <indir> --species <species-name> [...]"
+    echo 
     echo "DESCRIPTION:"
     echo "  This will run the BactFinder Nextflow workflow to examine bacterial"
     echo "  genome assemblies with ResFinder, VirulenceFinder and PlasmidFinder"
@@ -51,23 +51,22 @@ script_help() {
     echo "  --species       <str>   Quoted string with focal species name, e.g.: --species 'Enterobacter cloacae'"
     echo
     echo "OTHER KEY OPTIONS:"
-    echo "  -o/--outdir     <dir>   Output directory for workflow results       [default: 'results/ghru_finder']"
+    echo "  -o/--outdir     <dir>   Output directory for workflow results       [default: 'results/nf_bactfinder']"
     echo "  --file_pattern  <str>   Single-quoted FASTQ file pattern (glob)     [default: '*fasta']"
-    echo "  --no_resume             Start workflow from beginning               [default: resume where it left off]"
     echo "  --more_args     <str>   Additional arguments to pass to 'nextflow run'"
-    echo "                            - You can use any additional option of Nextflow and of the Nextflow workflow itself"
-    echo "                            - Use as follows (quote the entire string!): '$0 --more_args \"--res_cov 0.8\"'"
+    echo "                            - Use any additional option of Nextflow or of the workflow itself"
+    echo "                            - Example (quote the entire string!): '--more_args \"--res_cov 0.8\"'"
     echo
     echo "NEXTFLOW-RELATED OPTIONS:"
-    echo "  --nf_file       <file>  Main .nf workflow definition file           [default: 'workflows/nfcore-rnaseq/workflow/main.nf']"
     echo "  -no-resume              Don't attempt to resume workflow run        [default: resume workflow where it left off]"
     echo "  -profile        <str>   Profile to use from one of the config files [default: 'singularity']"
-    echo "  -work-dir       <dir>   Scratch (work) dir for the workflow         [default: '/fs/scratch/PAS0471/\$USER/nfc_rnaseq']"
+    echo "  -work-dir       <dir>   Scratch (work) dir for the workflow         [default: '/fs/scratch/PAS0471/\$USER/nf_bactfinder']"
     echo "  -c/-config      <file   Additional config file                      [default: none]"
     echo "  --container_dir <dir>   Singularity container dir                   [default: '/fs/project/PAS0471/containers']"
     echo
     echo "UTILITY OPTIONS:"
-    echo "  -h / --help             Print this help message and exit"
+    echo "  -h                      Print this help message and exit"
+    echo "  --help                  Print the workflow's help message and exit"
     echo
     echo "EXAMPLE COMMANDS:"
     echo "  sbatch $0 -i results/assemblies --species 'Enterobacter cloacae'"
@@ -99,7 +98,7 @@ load_tool_conda() {
 # Print the tool's help
 tool_help() {
     load_tool_conda
-    nextflow run "$nf_file" --help
+    nextflow run "$NF_REPO" --help
 }
 
 # Exit upon error with a message
@@ -156,15 +155,15 @@ while [ "$1" != "" ]; do
         -o | --outdir )     shift && outdir=$1 ;;
         --species )         shift && species=$1 ;;
         --file_pattern )    shift && file_pattern=$1 ;;
-        --nf_file )         shift && nf_file=$1 ;;
         --container_dir )   shift && container_dir=$1 ;;
         -work-dir )         shift && work_dir=$1 ;;
         -profile )          shift && profile=$1 ;;
         -config )           shift && config_file=$1 ;;
         --more_args )       shift && more_args=$1 ;;
         -no-resume )        resume=false ;;
-        -h | --help )       Help && exit ;;
-        * )                 die "Invalid option $1" && exit 1 ;;
+        -h )                script_help && exit ;;
+        --help )            tool_help && exit ;;
+        * )                 die "Invalid option $1";;
     esac
     shift
 done
@@ -173,7 +172,6 @@ done
 [[ "$indir" = "" ]] && die "Please specify an input dir with -i/--indir"
 [[ "$species" = "" ]] && die "Please specify a species with -s/--species"
 [[ ! -d "$indir" ]] && die "Input dir $indir does not exist"
-[[ ! -f "$nf_file" ]] && die "Nextflow file $nf_file does not exist"
 
 # ==============================================================================
 #                          INFRASTRUCTURE SETUP
@@ -224,7 +222,7 @@ echo "Species:                         $species"
 [[ -n "$file_pattern" ]] && echo "Input file pattern:              $file_pattern"
 echo
 echo "Resume previous run:             $resume"
-echo "Nextflow workflow file:          $nf_file"
+echo "Nextflow workflow file:          $NF_REPO"
 echo "Container dir:                   $container_dir"
 echo "Scratch (work) dir:              $work_dir"
 echo "Config file argument:            $config_arg"
@@ -249,7 +247,7 @@ mkdir -pv "$work_dir" "$container_dir" "$log_dir" "$trace_dir"
 
 # Run the workflow run command
 log_time "Starting the workflow...\n"
-runstats nextflow run "$nf_file" \
+runstats nextflow run "$NF_REPO" \
     --indir "$indir" \
     --outdir "$outdir" \
     --species "$species" \
