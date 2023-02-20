@@ -1,16 +1,26 @@
-## Workflow to process samples through AMR pipelines
+## Workflow to for AMR, Virulence and plasmid detection in bacterial genome assemblies
 
-This workflow runs `ResFinder`, `VirulenceFinder` and `Plasmidfinder`
+This workflow runs [`ResFinder 4.1.11`](https://bitbucket.org/genomicepidemiology/resfinder),
+[`VirulenceFinder 2.0.4`](https://bitbucket.org/genomicepidemiology/virulencefinder) and
+[`Plasmidfinder 2.1.6`](https://bitbucket.org/genomicepidemiology/plasmidfinder)
 on bacterial genome assemblies.
 
 Modified after an [original version](https://gitlab.com/cgps/ghru/pipelines/amr_prediction.git)
 by Anthony Underwood that ran `ARIBA` and `ResFinder`.
 
-### Usage
+### Workflow usage
+
+- For usage at the Ohio Supercomputer Center (OSC),
+  use the wrapper shell script (see section below) instead of calling the workflow
+  directly.
+
+- To run the workflow outside of the Ohio Supercomputer Center,
+  change the Conda environments in `nextflow.config`.
+  You'll also have to install Nextflow, in that case.
 
 ```
 ==============================================
-Bactfinder Pipeline
+                Bactfinder Pipeline
 ==============================================
 
 REQUIRED OPTIONS:
@@ -19,12 +29,50 @@ REQUIRED OPTIONS:
 
 OTHER OPTIONS:
   --outdir              Path to output dir                              [default: 'results/ghru_finder']
-  --file_pattern        The globbing pattern to match FASTA files in the indir [default: '*fasta']
+  --file_pattern        Glob to match FASTA files in the indir          [default: '*fasta']
   --no_point_mut        Skip ResFinder point-mutation resistance        [default: include]
-  --res_cov             Minimum coverage of match for Resfinder         [default: 0.9]
-  --res_id              Minimum identity of match for Resfinder         [default: 0.9]
-  --virulence_cov       Minimum coverage of match for Virulencefinder   [default: 0.9]
-  --virulence_id        Minimum identity of match for Virulencefinder   [default: 0.9]
-  --plasmid_cov         Minimum coverage of match for Plasmidfinder     [default: 0.9]
-  --plasmid_id          Minimum identity of match for Plasmidfinder     [default: 0.9]
+  --res_cov             Minimum coverage of match for ResFinder         [default: 0.9]
+  --res_id              Minimum identity of match for ResFinder         [default: 0.9]
+  --virulence_cov       Minimum coverage of match for VirulenceFinder   [default: 0.6]
+  --virulence_id        Minimum identity of match for VirulenceFinder   [default: 0.9]
+  --plasmid_cov         Minimum coverage of match for PlasmidFinder     [default: 0.6]
+  --plasmid_id          Minimum identity of match for PlasmidFinder     [default: 0.9]
+```
+
+### Wrapper script usage
+
+If you're not part of OSC project `PAS0471`,
+specify your project (account) in the `sbatch` call:
+`sbatch -A PROJECT_NR nf_bactfinder.sh`
+
+```
+USAGE:
+  sbatch nf_bactfinder.sh -i <indir> --species <species-name> [...]
+
+REQUIRED OPTIONS:
+  -i/--indir      <dir>   Input directory with assembly nucleotide FASTA files
+  --species       <str>   Quoted string with focal species name, e.g.: --species 'Enterobacter cloacae'
+
+OTHER KEY OPTIONS:
+  -o/--outdir     <dir>   Output directory for workflow results       [default: 'results/ghru_finder']
+  --file_pattern  <str>   Single-quoted FASTQ file pattern (glob)     [default: '*fasta']
+  --no_resume             Start workflow from beginning               [default: resume where it left off]
+  --more_args     <str>   Additional arguments to pass to 'nextflow run'
+                            - You can use any additional option of Nextflow and of the Nextflow workflow itself
+                            - Use as follows (quote the entire string!): '$0 --more_args \"--res_cov 0.8\"'
+
+NEXTFLOW-RELATED OPTIONS:
+  --nf_file       <file>  Main .nf workflow definition file           [default: 'workflows/nfcore-rnaseq/workflow/main.nf']
+  -no-resume              Don't attempt to resume workflow run        [default: resume workflow where it left off]
+  -profile        <str>   Profile to use from one of the config files [default: 'singularity']
+  -work-dir       <dir>   Scratch (work) dir for the workflow         [default: '/fs/scratch/PAS0471/\$USER/nfc_rnaseq']
+  -c/-config      <file   Additional config file                      [default: none]
+  --container_dir <dir>   Singularity container dir                   [default: '/fs/project/PAS0471/containers']
+
+UTILITY OPTIONS:
+  -h / --help             Print this help message and exit
+
+EXAMPLE COMMANDS:
+  sbatch $0 -i results/assemblies --species 'Enterobacter cloacae'
+  sbatch $0 -i results/assemblies --species 'Salmonella enterica' --file_pattern '*fna'
 ```
