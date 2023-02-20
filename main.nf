@@ -10,7 +10,7 @@ version = '0.2'
 def versionMessage() {
     log.info"""
     ============================================================================
-                 RES/PLASMID/VIRULENCE-FINDER WORKFLOW - version ${version}
+                        BACTFINDER WORKFLOW - version ${version}
     ============================================================================
     """.stripIndent()
 }
@@ -24,14 +24,14 @@ def help_message() {
         
         OTHER OPTIONS:
           --outdir              Path to output dir                              [default: 'results/ghru_finder']
-          --file_pattern        The globbing pattern to match FASTA files in the indir [default: '*fasta']
+          --file_pattern        Glob to match FASTA files in the indir          [default: '*fasta']
           --no_point_mut        Skip ResFinder point-mutation resistance        [default: include]
-          --res_cov             Minimum coverage of match for Resfinder         [default: 0.9]
-          --res_id              Minimum identity of match  for Resfinder        [default: 0.9]
-          --virulence_cov       Minimum coverage of match for Virulencefinder   [default: 0.9]
-          --virulence_id        Minimum identity of match  for Virulencefinder  [default: 0.9]
-          --plasmid_cov         Minimum coverage of match for Plasmidfinder     [default: 0.9]
-          --plasmid_id          Minimum identity of match  for Plasmidfinder    [default: 0.9]
+          --res_cov             Minimum coverage of match for ResFinder         [default: 0.9]
+          --res_id              Minimum identity of match  for ResFinder        [default: 0.9]
+          --virulence_cov       Minimum coverage of match for VirulenceFinder   [default: 0.6]
+          --virulence_id        Minimum identity of match  for VirulenceFinder  [default: 0.9]
+          --plasmid_cov         Minimum coverage of match for PlasmidFinder     [default: 0.6]
+          --plasmid_id          Minimum identity of match  for PlasmidFinder    [default: 0.9]
         """.stripIndent()
     )
 }
