@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # To run this file use the command
 # python3 parse_resfinder_4_output.py <SPACE SEPARATED LIST OF IDS> <PATH TO RESFINDER 4 OUTPUT DIR> <SPECIES NAME>
 # e.g python3 parse_resfinder_4_output.py 'sample1 sample2 sample3' output_dir 'staphylococcus_aureus'
