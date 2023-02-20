@@ -58,11 +58,11 @@ OTHER KEY OPTIONS:
   --file_pattern  <str>   Single-quoted FASTQ file pattern (glob)     [default: '*fasta']
   --more_args     <str>   Additional arguments to pass to 'nextflow run'
                             - Use any additional option of Nextflow or of the workflow itself
-                            - Example (quote the entire string!): '--more_args "--res_cov 0.8"'
+                            - Example (quote the entire string!): --more_args "--res_cov 0.8"
 
 NEXTFLOW-RELATED OPTIONS:
   -no-resume              Don't attempt to resume workflow run        [default: resume workflow where it left off]
-  -profile        <str>   Profile to use from one of the config files [default: 'singularity']
+  -profile        <str>   Profile to use from one of the config files [default: 'conda']
   -work-dir       <dir>   Scratch (work) dir for the workflow         [default: '/fs/scratch/PAS0471/$USER/nf_bactfinder']
   -c/-config      <file   Additional config file                      [default: none]
   --container_dir <dir>   Singularity container dir                   [default: '/fs/project/PAS0471/containers']
