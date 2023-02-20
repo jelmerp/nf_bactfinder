@@ -28,7 +28,7 @@ REQUIRED OPTIONS:
   --species             Quoted name of the species, e.g. "Salmonella enterica"
 
 OTHER OPTIONS:
-  --outdir              Path to output dir                              [default: 'results/ghru_finder']
+  --outdir              Path to output dir                              [default: 'results/nf_bactfinder']
   --file_pattern        Glob to match FASTA files in the indir          [default: '*fasta']
   --no_point_mut        Skip ResFinder point-mutation resistance        [default: include]
   --res_cov             Minimum coverage of match for ResFinder         [default: 0.9]
@@ -54,25 +54,24 @@ REQUIRED OPTIONS:
   --species       <str>   Quoted string with focal species name, e.g.: --species 'Enterobacter cloacae'
 
 OTHER KEY OPTIONS:
-  -o/--outdir     <dir>   Output directory for workflow results       [default: 'results/ghru_finder']
+  -o/--outdir     <dir>   Output directory for workflow results       [default: 'results/nf_bactfinder']
   --file_pattern  <str>   Single-quoted FASTQ file pattern (glob)     [default: '*fasta']
-  --no_resume             Start workflow from beginning               [default: resume where it left off]
   --more_args     <str>   Additional arguments to pass to 'nextflow run'
-                            - You can use any additional option of Nextflow and of the Nextflow workflow itself
-                            - Use as follows (quote the entire string!): '$0 --more_args \"--res_cov 0.8\"'
+                            - Use any additional option of Nextflow or of the workflow itself
+                            - Example (quote the entire string!): '--more_args "--res_cov 0.8"'
 
 NEXTFLOW-RELATED OPTIONS:
-  --nf_file       <file>  Main .nf workflow definition file           [default: 'workflows/nfcore-rnaseq/workflow/main.nf']
   -no-resume              Don't attempt to resume workflow run        [default: resume workflow where it left off]
   -profile        <str>   Profile to use from one of the config files [default: 'singularity']
-  -work-dir       <dir>   Scratch (work) dir for the workflow         [default: '/fs/scratch/PAS0471/\$USER/nfc_rnaseq']
+  -work-dir       <dir>   Scratch (work) dir for the workflow         [default: '/fs/scratch/PAS0471/$USER/nf_bactfinder']
   -c/-config      <file   Additional config file                      [default: none]
   --container_dir <dir>   Singularity container dir                   [default: '/fs/project/PAS0471/containers']
 
 UTILITY OPTIONS:
-  -h / --help             Print this help message and exit
+  -h                      Print this help message and exit
+  --help                  Print the workflow's help message and exit
 
 EXAMPLE COMMANDS:
-  sbatch $0 -i results/assemblies --species 'Enterobacter cloacae'
-  sbatch $0 -i results/assemblies --species 'Salmonella enterica' --file_pattern '*fna'
+  sbatch nf_bactfinder.sh -i results/assemblies --species 'Enterobacter cloacae'
+  sbatch nf_bactfinder.sh -i results/assemblies --species 'Salmonella enterica' --file_pattern '*fna'
 ```
